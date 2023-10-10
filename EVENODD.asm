@@ -1,0 +1,79 @@
+org 100h
+
+.DATA
+
+FA DB 'ENTER A NUMBER: $'
+OP DB 'RESULT IS: $'  
+
+
+
+NEXT DB 0DH, 0AH, '$'
+
+.CODE
+
+MOV AX, @DATA
+MOV DS, AX    
+
+
+;FIRST INPUT
+
+MOV AH, 9
+
+LEA DX, NEXT
+INT 21H
+
+LEA DX, FA 
+INT 21H 
+
+MOV AH, 1
+INT 21H
+
+
+MOV AL, 2  
+DIV AL
+  
+
+;RESULT
+
+MOV AH, 9
+
+LEA DX, NEXT
+INT 21H
+
+LEA DX, OP 
+INT 21H
+
+
+;STATMENT  
+
+MOV AH, 2
+
+CMP AL, 0  
+
+JE RESULT  
+ 
+ MOV DL, AL
+ INT 21H 
+  
+ 
+ JMP END
+
+
+RESULT: 
+ MOV DL, AL
+ INT 21H
+ 
+ 
+ JMP END  
+ 
+ 
+END:
+ MOV AH, 4CH
+ INT 21H
+
+
+ret
+
+
+
+

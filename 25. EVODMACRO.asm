@@ -1,67 +1,67 @@
-ODD MACRO NUM1  
-    MOV SI, OFFSET NUM1
-    
-    Loop_1:
-    MOV AX, [SI] 
-    MOV BX, 2
-    DIV BX 
-    ;MOV REMINDER, DX 
+WHATNUM MACRO ARRAY_ADDRESS, ARRAY_SIZE
 
-    CMP DX, 0 
-    JMP RESULT1
-    INC SI
-    LOOP Loop_1  
-    
-    RESULT1: 
-     MOV AH, 02H
-     INT 21H
-    LOOP RESULT1
    
-    MOV DX, AX
-    MOV AH, 02H
-    INT 21H
-  
-ENDM  
+    MOV BX, ARRAY_ADDRESS
+    MOV CX, ARRAY_SIZE
 
-
-EVEN MACRO NUM2
-    MOV SI, OFFSET NUM2
-    
-    Loop_2:
-    MOV AX, [SI] 
-    MOV BX, 2
-    DIV BX 
-    ;MOV REMINDER, DX 
-
-    CMP DX, 0 
-    JMP RESULT2
-    INC SI
-    LOOP Loop_2 
-    
-    RESULT2: 
-     MOV AH, 02H
-     INT 21H
-    LOOP RESULT2
    
-    MOV DX, AX
-    MOV AH, 02H
-    INT 21H
- 
-ENDM 
+    LOOP_START:
+        MOV AL, [BX]   
+        TEST AL, 01H   
+        JNZ IS_ODD     
+        JMP IS_EVEN
+
+    IS_ODD:
+        MOV AH, 02H
+        INT 21H
+        JMP LOOP_CONTINUE
+
+    IS_EVEN:
+        MOV AH, 02H
+        INT 21H
+        JMP LOOP_CONTINUE
+
+    LOOP_CONTINUE:
+        INC BX         
+        LOOP LOOP_START 
+    ENDM
 
 
-ORG 100H
+.MODEL SMALL
+.STACK 100H
+
 .DATA
- ARR DB 2, 0, 4, 7, 1, 9
- 
+ARRAY_SIZE      DW 5           
+ARRAY           DB 5 DUP(?)    
+
 .CODE
- MOV AX, @DATA
- MOV DS, AX
- 
- ODD ARR
- EVEN ARR  
- 
- MOV AH, 04H
- INT 21H
- 
-RET
+MAIN PROC
+
+    MOV AX, @DATA
+    MOV DS, AX
+
+    
+    MOV CX, ARRAY_SIZE
+    MOV SI, OFFSET ARRAY
+    MOV AH, 01H     
+
+    
+    L1:
+    INT 21H         
+    SUB AL, 30H     
+    MOV [SI], AL    
+    INC SI
+    LOOP L1
+
+    
+    LEA SI, ARRAY
+    MOV CX, ARRAY_SIZE
+    WHATNUM SI, CX
+
+    
+    MOV AH, 4CH     
+    INT 21H
+
+MAIN ENDP
+
+END MAIN
